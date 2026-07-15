@@ -9,20 +9,6 @@
     <span><strong>Data:</strong> <%= new Date(project.created_at).toLocaleDateString('pt-BR') %></span>
   </div>
 
-  <% if (project.conversation_messages && project.conversation_messages.length > 0) { %>
-    <details class="conversation-details">
-      <summary>Ver conversa do cliente</summary>
-      <div class="conversation-log">
-        <% project.conversation_messages.forEach(msg => { %>
-          <div class="conv-msg <%= msg.role %>">
-            <strong><%= msg.role === 'ai' ? 'AI' : 'Funcionário' %>:</strong>
-            <span><%= msg.content %></span>
-          </div>
-        <% }); %>
-      </div>
-    </details>
-  <% } %>
-
   <details class="response-details">
     <summary>Responder</summary>
     <form action="/marketing/respond/<%= project.id %>" method="POST" class="response-form">
