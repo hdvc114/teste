@@ -99,7 +99,7 @@ app.post('/chat/:sessionId/message', async (req, res) => {
 
 app.post('/chat/:sessionId/project', async (req, res) => {
   const { sessionId } = req.params;
-  const { title, description, creator_name, creator_email } = req.body;
+  const { title, description, creator_name } = req.body;
 
   let conv = await pool.query(
     'SELECT id FROM conversations WHERE session_id = $1',
@@ -114,9 +114,9 @@ app.post('/chat/:sessionId/project', async (req, res) => {
   }
 
   const project = await pool.query(
-    `INSERT INTO projects (title, description, creator_name, creator_email, conversation_id)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [title, description, creator_name, creator_email, conv.rows[0].id]
+    `INSERT INTO projects (title, description, creator_name, conversation_id)
+     VALUES ($1, $2, $3, $4) RETURNING *`,
+    [title, description, creator_name, conv.rows[0].id]
   );
 
   const messages = conv.rows[0].messages || [];
