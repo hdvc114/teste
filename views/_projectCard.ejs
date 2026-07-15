@@ -15,7 +15,7 @@
       <div class="conversation-log">
         <% project.conversation_messages.forEach(msg => { %>
           <div class="conv-msg <%= msg.role %>">
-            <strong><%= msg.role === 'ai' ? 'AI' : 'Cliente' %>:</strong>
+            <strong><%= msg.role === 'ai' ? 'AI' : 'Funcionário' %>:</strong>
             <span><%= msg.content %></span>
           </div>
         <% }); %>
@@ -36,7 +36,7 @@
       <h4>Respostas:</h4>
       <% responsesByProject[project.id].forEach(resp => { %>
         <div class="response-item <%= resp.role %>-response">
-          <div class="response-author"><%= resp.role === 'marketing' ? 'Marketing' : 'Cliente' %></div>
+          <div class="response-author"><%= resp.role === 'marketing' ? 'Marketing' : 'Funcionário' %></div>
           <p><%= resp.message %></p>
           <small><%= new Date(resp.created_at).toLocaleString('pt-BR') %></small>
         </div>

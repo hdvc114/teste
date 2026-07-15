@@ -52,7 +52,7 @@
                 <h4><span class="response-badge">&#128172;</span> Conversa:</h4>
                 <% responsesByProject[project.id].forEach(resp => { %>
                   <div class="response-item <%= resp.role %>-response">
-                    <div class="response-author"><%= resp.role === 'marketing' ? 'Marketing' : 'Você' %></div>
+                    <div class="response-author"><%= resp.role === 'marketing' ? 'Funcionário' : 'Você' %></div>
                     <p><%= resp.message %></p>
                     <small><%= new Date(resp.created_at).toLocaleString('pt-BR') %></small>
                   </div>

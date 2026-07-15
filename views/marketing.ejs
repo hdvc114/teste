@@ -28,14 +28,14 @@
         <span class="tab-badge yellow"><%= waitingCreator.length %></span> Respondidos
       </a>
       <a href="#replied" class="tab-link <%= creatorReplied.length > 0 && unresponded.length === 0 && waitingCreator.length === 0 ? 'active' : '' %>">
-        <span class="tab-badge green"><%= creatorReplied.length %></span> Cliente respondeu
+        <span class="tab-badge green"><%= creatorReplied.length %></span> Funcionário respondeu
       </a>
     </div>
 
     <% if (unresponded.length > 0) { %>
       <div id="unresponded" class="section-block">
         <div class="section-header">
-          <h2 class="section-title"><span class="section-badge red-badge"><%= unresponded.length %></span> Aguardando resposta do Marketing</h2>
+          <h2 class="section-title"><span class="section-badge red-badge"><%= unresponded.length %></span> Aguardando resposta</h2>
           <p class="section-desc">Você ainda não respondeu a estes projetos.</p>
         </div>
         <div class="projects-grid">
@@ -49,8 +49,8 @@
     <% if (waitingCreator.length > 0) { %>
       <div id="waiting" class="section-block">
         <div class="section-header">
-          <h2 class="section-title"><span class="section-badge yellow-badge"><%= waitingCreator.length %></span> Aguardando resposta do Cliente</h2>
-          <p class="section-desc">Você respondeu, mas o cliente ainda não respondeu de volta.</p>
+          <h2 class="section-title"><span class="section-badge yellow-badge"><%= waitingCreator.length %></span> Aguardando resposta do Funcionário</h2>
+          <p class="section-desc">Você respondeu, mas o funcionário ainda não respondeu.</p>
         </div>
         <div class="projects-grid">
           <% waitingCreator.forEach(project => { %>
@@ -63,8 +63,8 @@
     <% if (creatorReplied.length > 0) { %>
       <div id="replied" class="section-block">
         <div class="section-header">
-          <h2 class="section-title"><span class="section-badge green-badge"><%= creatorReplied.length %></span> Cliente respondeu</h2>
-          <p class="section-desc">O cliente respondeu à sua mensagem. Veja o que ele disse.</p>
+          <h2 class="section-title"><span class="section-badge green-badge"><%= creatorReplied.length %></span> Funcionário respondeu</h2>
+          <p class="section-desc">O funcionário respondeu à sua mensagem. Veja o que ele disse.</p>
         </div>
         <div class="projects-grid">
           <% creatorReplied.forEach(project => { %>
