@@ -1,0 +1,17 @@
+{
+  "name": "projects-app",
+  "version": "1.0.0",
+  "description": "Projects platform with AI chat",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "pg": "^8.13.0",
+    "uuid": "^10.0.0"
+  }
+}

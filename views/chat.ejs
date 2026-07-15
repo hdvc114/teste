@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat - Projects</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo small">
+        <span class="logo-icon">&#9670;</span>
+        <span>Projects</span>
+      </a>
+      <span class="badge">Não Marketing</span>
+    </div>
+  </header>
+
+  <main class="chat-page">
+    <div class="chat-layout">
+      <div class="chat-container" id="chatContainer">
+        <div class="chat-messages" id="chatMessages">
+          <div class="message ai">
+            <div class="msg-avatar">AI</div>
+            <div class="msg-content">
+              <p>Olá! Eu sou o assistente do Projects. Conte-me sobre sua ideia ou projeto. Quando estiver pronto, você pode enviá-lo pelo formulário ao lado.</p>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input">
+          <input type="text" id="messageInput" placeholder="Digite sua mensagem..." />
+          <button id="sendBtn">Enviar</button>
+        </div>
+      </div>
+
+      <div class="project-form">
+        <h2>Enviar Projeto</h2>
+        <p class="form-info">Preencha abaixo para enviar seu projeto para nossa equipe.</p>
+        <form id="projectForm">
+          <div class="form-group">
+            <label for="title">Título do Projeto</label>
+            <input type="text" id="title" name="title" required />
+          </div>
+          <div class="form-group">
+            <label for="description">Descrição</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="creator_name">Seu Nome</label>
+            <input type="text" id="creator_name" name="creator_name" required />
+          </div>
+          <div class="form-group">
+            <label for="creator_email">Seu Email</label>
+            <input type="email" id="creator_email" name="creator_email" required />
+          </div>
+          <button type="submit" class="btn-submit">Enviar Projeto</button>
+        </form>
+        <div id="projectSuccess" class="hidden">
+          <div class="success-msg">
+            <span class="success-icon">&#10003;</span>
+            <p>Projeto enviado com sucesso! Nossa equipe entrará em contato.</p>
+            <a href="/" class="btn">Voltar ao início</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const sessionId = '<%= sessionId %>';
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const projectForm = document.getElementById('projectForm');
+    const projectSuccess = document.getElementById('projectSuccess');
+
+    function addMessage(role, content) {
+      const div = document.createElement('div');
+      div.className = `message ${role}`;
+      div.innerHTML = `
+        <div class="msg-avatar">${role === 'ai' ? 'AI' : 'Você'}</div>
+        <div class="msg-content"><p>${content}</p></div>
+      `;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', async () => {
+      const msg = messageInput.value.trim();
+      if (!msg) return;
+      messageInput.value = '';
+      addMessage('user', msg);
+
+      const res = await fetch(`/chat/${sessionId}/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg }),
+      });
+      const data = await res.json();
+      const aiMsg = data.messages[data.messages.length - 1];
+      if (aiMsg.role === 'ai') {
+        addMessage('ai', aiMsg.content);
+      }
+    });
+
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+
+    projectForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = new FormData(projectForm);
+      const data = Object.fromEntries(form);
+      const res = await fetch(`/chat/${sessionId}/project`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (result.success) {
+        projectForm.classList.add('hidden');
+        projectSuccess.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
