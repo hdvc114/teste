@@ -74,7 +74,7 @@ app.post('/chat/:sessionId/message', async (req, res) => {
   apiMessages.push({ role: 'user', content: message });
 
   const completion = await openai.chat.completions.create({
-    model: 'llama3.2:3b',
+    model: 'llama3.2:1b',
     messages: [
       {
         role: 'system',
