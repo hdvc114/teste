@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acompanhar Projeto - Projects</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo small">
+        <span class="logo-icon">&#9670;</span>
+        <span>Projects</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="track-page">
+    <h1>Acompanhar Projeto</h1>
+    <p class="subtitle">Digite seu nome para ver seus projetos e as respostas do marketing.</p>
+
+    <form action="/track" method="POST" class="track-form">
+      <div class="form-group">
+        <label for="name">Seu Nome</label>
+        <input type="text" id="name" name="name" value="<%= name %>" required placeholder="Digite o nome que você usou no cadastro" />
+      </div>
+      <button type="submit" class="btn-submit">Buscar</button>
+    </form>
+
+    <% if (projects !== null && projects.length === 0) { %>
+      <div class="empty-state">
+        <p>Nenhum projeto encontrado com esse nome.</p>
+      </div>
+    <% } %>
+
+    <% if (projects && projects.length > 0) { %>
+      <div class="projects-list">
+        <% projects.forEach(project => { %>
+          <div class="project-card">
+            <div class="project-header">
+              <h2><%= project.title %></h2>
+              <span class="status <%= project.status %>"><%= project.status === 'submitted' ? 'Aguardando' : project.status %></span>
+            </div>
+            <p class="project-desc"><%= project.description %></p>
+            <div class="project-meta">
+              <span><strong>Email:</strong> <%= project.creator_email %></span>
+              <span><strong>Data:</strong> <%= new Date(project.created_at).toLocaleDateString('pt-BR') %></span>
+            </div>
+
+            <% if (responsesByProject && responsesByProject[project.id] && responsesByProject[project.id].length > 0) { %>
+              <div class="responses">
+                <h4><span class="response-badge">&#128172;</span> Respostas do Marketing:</h4>
+                <% responsesByProject[project.id].forEach(resp => { %>
+                  <div class="response-item marketing-response">
+                    <div class="response-author">Marketing</div>
+                    <p><%= resp.message %></p>
+                    <small><%= new Date(resp.created_at).toLocaleString('pt-BR') %></small>
+                  </div>
+                <% }); %>
+              </div>
+            <% } else { %>
+              <div class="no-response">
+                <p>&#128064; Nenhuma resposta do marketing ainda. Assim que responderem, aparecerá aqui.</p>
+              </div>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <div class="track-footer">
+      <a href="/" class="btn-link">&#8592; Voltar ao início</a>
+    </div>
+  </main>
+</body>
+</html>

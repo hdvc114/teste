@@ -170,6 +170,28 @@ app.post('/marketing/respond/:projectId', async (req, res) => {
   res.redirect('/marketing');
 });
 
+app.get('/track', (req, res) => {
+  res.render('track', { projects: null, name: '' });
+});
+
+app.post('/track', async (req, res) => {
+  const { name } = req.body;
+  const projects = await pool.query(
+    `SELECT p.* FROM projects p WHERE LOWER(p.creator_name) = LOWER($1) ORDER BY p.created_at DESC`,
+    [name]
+  );
+
+  const responses = await pool.query('SELECT * FROM responses ORDER BY created_at ASC');
+
+  const responsesByProject = {};
+  responses.rows.forEach(r => {
+    if (!responsesByProject[r.project_id]) responsesByProject[r.project_id] = [];
+    responsesByProject[r.project_id].push(r);
+  });
+
+  res.render('track', { projects: projects.rows, name, responsesByProject });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
