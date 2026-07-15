@@ -20,25 +20,57 @@
   <main class="marketing-page">
     <h1>Projetos Recebidos</h1>
 
+    <div class="section-tabs">
+      <a href="#unresponded" class="tab-link <%= unresponded.length > 0 ? 'active' : '' %>">
+        <span class="tab-badge red"><%= unresponded.length %></span> Aguardando
+      </a>
+      <a href="#waiting" class="tab-link <%= waitingCreator.length > 0 && unresponded.length === 0 ? 'active' : '' %>">
+        <span class="tab-badge yellow"><%= waitingCreator.length %></span> Respondidos
+      </a>
+      <a href="#replied" class="tab-link <%= creatorReplied.length > 0 && unresponded.length === 0 && waitingCreator.length === 0 ? 'active' : '' %>">
+        <span class="tab-badge green"><%= creatorReplied.length %></span> Cliente respondeu
+      </a>
+    </div>
+
     <% if (unresponded.length > 0) { %>
-      <div class="section-header">
-        <h2 class="section-title"><span class="section-badge unanswered-badge"><%= unresponded.length %></span> Aguardando resposta</h2>
-      </div>
-      <div class="projects-grid">
-        <% unresponded.forEach(project => { %>
-          <%- include('_projectCard', { project, responsesByProject }) %>
-        <% }); %>
+      <div id="unresponded" class="section-block">
+        <div class="section-header">
+          <h2 class="section-title"><span class="section-badge red-badge"><%= unresponded.length %></span> Aguardando resposta do Marketing</h2>
+          <p class="section-desc">Você ainda não respondeu a estes projetos.</p>
+        </div>
+        <div class="projects-grid">
+          <% unresponded.forEach(project => { %>
+            <%- include('_projectCard', { project, responsesByProject }) %>
+          <% }); %>
+        </div>
       </div>
     <% } %>
 
-    <% if (responded.length > 0) { %>
-      <div class="section-header">
-        <h2 class="section-title"><span class="section-badge answered-badge"><%= responded.length %></span> Respondidos</h2>
+    <% if (waitingCreator.length > 0) { %>
+      <div id="waiting" class="section-block">
+        <div class="section-header">
+          <h2 class="section-title"><span class="section-badge yellow-badge"><%= waitingCreator.length %></span> Aguardando resposta do Cliente</h2>
+          <p class="section-desc">Você respondeu, mas o cliente ainda não respondeu de volta.</p>
+        </div>
+        <div class="projects-grid">
+          <% waitingCreator.forEach(project => { %>
+            <%- include('_projectCard', { project, responsesByProject }) %>
+          <% }); %>
+        </div>
       </div>
-      <div class="projects-grid">
-        <% responded.forEach(project => { %>
-          <%- include('_projectCard', { project, responsesByProject }) %>
-        <% }); %>
+    <% } %>
+
+    <% if (creatorReplied.length > 0) { %>
+      <div id="replied" class="section-block">
+        <div class="section-header">
+          <h2 class="section-title"><span class="section-badge green-badge"><%= creatorReplied.length %></span> Cliente respondeu</h2>
+          <p class="section-desc">O cliente respondeu à sua mensagem. Veja o que ele disse.</p>
+        </div>
+        <div class="projects-grid">
+          <% creatorReplied.forEach(project => { %>
+            <%- include('_projectCard', { project, responsesByProject }) %>
+          <% }); %>
+        </div>
       </div>
     <% } %>
 

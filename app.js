@@ -152,21 +152,27 @@ app.get('/marketing', async (req, res) => {
     responsesByProject[r.project_id].push(r);
   });
 
-  const responded = [];
   const unresponded = [];
+  const waitingCreator = [];
+  const creatorReplied = [];
   projects.rows.forEach(p => {
-    const hasMarketing = (responsesByProject[p.id] || []).some(r => r.role === 'marketing');
-    if (hasMarketing) {
-      responded.push(p);
-    } else {
+    const projectResponses = responsesByProject[p.id] || [];
+    const hasMarketing = projectResponses.some(r => r.role === 'marketing');
+    const hasCreator = projectResponses.some(r => r.role === 'creator');
+    if (!hasMarketing) {
       unresponded.push(p);
+    } else if (hasCreator) {
+      creatorReplied.push(p);
+    } else {
+      waitingCreator.push(p);
     }
   });
 
   res.render('marketing', {
     projects: projects.rows,
-    responded,
     unresponded,
+    waitingCreator,
+    creatorReplied,
     responsesByProject,
   });
 });
