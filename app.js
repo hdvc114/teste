@@ -74,11 +74,11 @@ app.post('/chat/:sessionId/message', async (req, res) => {
   apiMessages.push({ role: 'user', content: message });
 
   const completion = await openai.chat.completions.create({
-    model: 'llama3.2:1b',
+    model: 'qwen2.5:0.5b',
     messages: [
       {
         role: 'system',
-        content: 'Você é um assistente amigável de uma plataforma chamada Projects, onde pessoas compartilham ideias e projetos. Ajude o usuário a refinar sua ideia e incentive-o a enviar o projeto quando estiver pronto. Responda em português de forma natural e conversacional.',
+        content: 'Você é um assistente do Projects. Ajude o usuário com sua ideia e incentive a enviar o projeto. Responda em português.',
       },
       ...apiMessages,
     ],

@@ -85,24 +85,41 @@
       `;
       chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
+      return div;
+    }
+
+    function removeMessage(el) {
+      if (el && el.parentNode) el.parentNode.removeChild(el);
     }
 
     sendBtn.addEventListener('click', async () => {
       const msg = messageInput.value.trim();
       if (!msg) return;
       messageInput.value = '';
+      sendBtn.disabled = true;
+      sendBtn.textContent = '...';
       addMessage('user', msg);
+      const loadingEl = addMessage('ai', 'IA está pensando<span class="typing-dots"></span>');
+      loadingEl.classList.add('loading');
 
-      const res = await fetch(`/chat/${sessionId}/message`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg }),
-      });
-      const data = await res.json();
-      const aiMsg = data.messages[data.messages.length - 1];
-      if (aiMsg.role === 'ai') {
-        addMessage('ai', aiMsg.content);
+      try {
+        const res = await fetch(`/chat/${sessionId}/message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg }),
+        });
+        const data = await res.json();
+        removeMessage(loadingEl);
+        const aiMsg = data.messages[data.messages.length - 1];
+        if (aiMsg.role === 'ai') {
+          addMessage('ai', aiMsg.content);
+        }
+      } catch (e) {
+        removeMessage(loadingEl);
+        addMessage('ai', 'Desculpe, ocorreu um erro. Tente novamente.');
       }
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Enviar';
     });
 
     messageInput.addEventListener('keypress', (e) => {
