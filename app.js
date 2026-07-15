@@ -2,6 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const OpenAI = require('openai');
 require('dotenv/config');
 
 const app = express();
@@ -9,6 +10,11 @@ const PORT = process.env.PORT || 3000;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+});
+
+const openai = new OpenAI({
+  apiKey: 'ollama',
+  baseURL: 'http://localhost:11434/v1',
 });
 
 app.set('view engine', 'ejs');
@@ -60,19 +66,35 @@ app.post('/chat/:sessionId/message', async (req, res) => {
     );
   }
 
-  const messages = conv.rows[0].messages || [];
+  const storedMessages = conv.rows[0].messages || [];
+  const apiMessages = storedMessages.map(m => ({
+    role: m.role === 'ai' ? 'assistant' : m.role,
+    content: m.content,
+  }));
+  apiMessages.push({ role: 'user', content: message });
 
-  messages.push({ role: 'user', content: message, timestamp: new Date() });
+  const completion = await openai.chat.completions.create({
+    model: 'llama3.2:3b',
+    messages: [
+      {
+        role: 'system',
+        content: 'Você é um assistente amigável de uma plataforma chamada Projects, onde pessoas compartilham ideias e projetos. Ajude o usuário a refinar sua ideia e incentive-o a enviar o projeto quando estiver pronto. Responda em português de forma natural e conversacional.',
+      },
+      ...apiMessages,
+    ],
+  });
 
-  const aiResponse = generateAIResponse(message);
-  messages.push({ role: 'ai', content: aiResponse, timestamp: new Date() });
+  const aiResponse = completion.choices[0].message.content;
+
+  storedMessages.push({ role: 'user', content: message, timestamp: new Date() });
+  storedMessages.push({ role: 'ai', content: aiResponse, timestamp: new Date() });
 
   await pool.query(
     'UPDATE conversations SET messages = $1, updated_at = NOW() WHERE session_id = $2',
-    [JSON.stringify(messages), sessionId]
+    [JSON.stringify(storedMessages), sessionId]
   );
 
-  res.json({ messages });
+  res.json({ messages: storedMessages });
 });
 
 app.post('/chat/:sessionId/project', async (req, res) => {
@@ -147,23 +169,6 @@ app.post('/marketing/respond/:projectId', async (req, res) => {
 
   res.redirect('/marketing');
 });
-
-function generateAIResponse(userMessage) {
-  const lower = userMessage.toLowerCase();
-  if (lower.includes('olá') || lower.includes('oi') || lower.includes('bom dia')) {
-    return 'Olá! Como posso ajudar você hoje? Conte-me sobre sua ideia ou projeto.';
-  }
-  if (lower.includes('projeto') || lower.includes('ideia')) {
-    return 'Que legal! Me conte mais sobre seu projeto. Quando você estiver satisfeito, pode enviá-lo usando o formulário abaixo.';
-  }
-  if (lower.includes('preço') || lower.includes('custo') || lower.includes('valor')) {
-    return 'Para informações sobre preços, sugiro enviar seu projeto que nossa equipe comercial entrará em contato.';
-  }
-  if (lower.includes('obrigado') || lower.includes('valeu')) {
-    return 'Por nada! Se tiver mais alguma dúvida, estou aqui. Não esqueça de enviar seu projeto!';
-  }
-  return 'Entendi! Conte mais detalhes sobre o que você precisa. Assim que tiver pronto, use o formulário abaixo para enviar seu projeto.';
-}
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
