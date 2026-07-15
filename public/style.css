@@ -668,6 +668,18 @@ details summary:hover {
   font-size: 1.1rem;
 }
 
+.response-item.creator-response {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.response-item.creator-response .response-author {
+  color: #60a5fa;
+}
+
 .response-item.marketing-response {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.2);
@@ -721,6 +733,56 @@ details summary:hover {
 }
 
 .btn-link:hover {
+  color: #60a5fa;
+}
+
+.section-header {
+  margin: 2rem 0 1rem;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  color: #e0e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0 8px;
+}
+
+.unanswered-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.answered-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.reply-details {
+  margin-top: 0.5rem;
+}
+
+.reply-details summary {
+  color: #3b82f6;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.4rem 0;
+}
+
+.reply-details summary:hover {
   color: #60a5fa;
 }
 

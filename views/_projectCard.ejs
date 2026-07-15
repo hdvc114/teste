@@ -1,0 +1,47 @@
+<div class="project-card">
+  <div class="project-header">
+    <h2><%= project.title %></h2>
+    <span class="status <%= project.status %>"><%= project.status %></span>
+  </div>
+  <p class="project-desc"><%= project.description %></p>
+  <div class="project-meta">
+    <span><strong>Por:</strong> <%= project.creator_name %></span>
+    <span><strong>Email:</strong> <%= project.creator_email %></span>
+    <span><strong>Data:</strong> <%= new Date(project.created_at).toLocaleDateString('pt-BR') %></span>
+  </div>
+
+  <% if (project.conversation_messages && project.conversation_messages.length > 0) { %>
+    <details class="conversation-details">
+      <summary>Ver conversa do cliente</summary>
+      <div class="conversation-log">
+        <% project.conversation_messages.forEach(msg => { %>
+          <div class="conv-msg <%= msg.role %>">
+            <strong><%= msg.role === 'ai' ? 'AI' : 'Cliente' %>:</strong>
+            <span><%= msg.content %></span>
+          </div>
+        <% }); %>
+      </div>
+    </details>
+  <% } %>
+
+  <details class="response-details">
+    <summary>Responder</summary>
+    <form action="/marketing/respond/<%= project.id %>" method="POST" class="response-form">
+      <textarea name="message" rows="3" placeholder="Escreva sua resposta..." required></textarea>
+      <button type="submit">Enviar Resposta</button>
+    </form>
+  </details>
+
+  <% if (responsesByProject[project.id]) { %>
+    <div class="responses">
+      <h4>Respostas:</h4>
+      <% responsesByProject[project.id].forEach(resp => { %>
+        <div class="response-item <%= resp.role %>-response">
+          <div class="response-author"><%= resp.role === 'marketing' ? 'Marketing' : 'Cliente' %></div>
+          <p><%= resp.message %></p>
+          <small><%= new Date(resp.created_at).toLocaleString('pt-BR') %></small>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+</div>

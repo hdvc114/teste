@@ -143,7 +143,7 @@ app.get('/marketing', async (req, res) => {
   );
 
   const responses = await pool.query(
-    'SELECT * FROM responses ORDER BY created_at DESC'
+    'SELECT * FROM responses ORDER BY created_at ASC'
   );
 
   const responsesByProject = {};
@@ -152,8 +152,21 @@ app.get('/marketing', async (req, res) => {
     responsesByProject[r.project_id].push(r);
   });
 
+  const responded = [];
+  const unresponded = [];
+  projects.rows.forEach(p => {
+    const hasMarketing = (responsesByProject[p.id] || []).some(r => r.role === 'marketing');
+    if (hasMarketing) {
+      responded.push(p);
+    } else {
+      unresponded.push(p);
+    }
+  });
+
   res.render('marketing', {
     projects: projects.rows,
+    responded,
+    unresponded,
     responsesByProject,
   });
 });
@@ -163,15 +176,29 @@ app.post('/marketing/respond/:projectId', async (req, res) => {
   const { message } = req.body;
 
   await pool.query(
-    'INSERT INTO responses (project_id, message) VALUES ($1, $2)',
-    [projectId, message]
+    'INSERT INTO responses (project_id, message, role) VALUES ($1, $2, $3)',
+    [projectId, message, 'marketing']
   );
 
   res.redirect('/marketing');
 });
 
-app.get('/track', (req, res) => {
-  res.render('track', { projects: null, name: '' });
+app.get('/track', async (req, res) => {
+  const { name } = req.query;
+  if (!name) {
+    return res.render('track', { projects: null, name: '', responsesByProject: {} });
+  }
+  const projects = await pool.query(
+    `SELECT p.* FROM projects p WHERE LOWER(p.creator_name) = LOWER($1) ORDER BY p.created_at DESC`,
+    [name]
+  );
+  const responses = await pool.query('SELECT * FROM responses ORDER BY created_at ASC');
+  const responsesByProject = {};
+  responses.rows.forEach(r => {
+    if (!responsesByProject[r.project_id]) responsesByProject[r.project_id] = [];
+    responsesByProject[r.project_id].push(r);
+  });
+  res.render('track', { projects: projects.rows, name, responsesByProject });
 });
 
 app.post('/track', async (req, res) => {
@@ -181,7 +208,9 @@ app.post('/track', async (req, res) => {
     [name]
   );
 
-  const responses = await pool.query('SELECT * FROM responses ORDER BY created_at ASC');
+  const responses = await pool.query(
+    'SELECT * FROM responses ORDER BY created_at ASC'
+  );
 
   const responsesByProject = {};
   responses.rows.forEach(r => {
@@ -190,6 +219,18 @@ app.post('/track', async (req, res) => {
   });
 
   res.render('track', { projects: projects.rows, name, responsesByProject });
+});
+
+app.post('/track/reply/:projectId', async (req, res) => {
+  const { projectId } = req.params;
+  const { message, name } = req.body;
+
+  await pool.query(
+    'INSERT INTO responses (project_id, message, role) VALUES ($1, $2, $3)',
+    [projectId, message, 'creator']
+  );
+
+  res.redirect(`/track?name=${encodeURIComponent(name)}`);
 });
 
 app.listen(PORT, () => {

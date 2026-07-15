@@ -20,7 +20,7 @@
     <h1>Acompanhar Projeto</h1>
     <p class="subtitle">Digite seu nome para ver seus projetos e as respostas do marketing.</p>
 
-    <form action="/track" method="POST" class="track-form">
+    <form action="/track" method="GET" class="track-form">
       <div class="form-group">
         <label for="name">Seu Nome</label>
         <input type="text" id="name" name="name" value="<%= name %>" required placeholder="Digite o nome que você usou no cadastro" />
@@ -28,7 +28,7 @@
       <button type="submit" class="btn-submit">Buscar</button>
     </form>
 
-    <% if (projects !== null && projects.length === 0) { %>
+    <% if (name && projects !== null && projects.length === 0) { %>
       <div class="empty-state">
         <p>Nenhum projeto encontrado com esse nome.</p>
       </div>
@@ -50,15 +50,24 @@
 
             <% if (responsesByProject && responsesByProject[project.id] && responsesByProject[project.id].length > 0) { %>
               <div class="responses">
-                <h4><span class="response-badge">&#128172;</span> Respostas do Marketing:</h4>
+                <h4><span class="response-badge">&#128172;</span> Conversa:</h4>
                 <% responsesByProject[project.id].forEach(resp => { %>
-                  <div class="response-item marketing-response">
-                    <div class="response-author">Marketing</div>
+                  <div class="response-item <%= resp.role %>-response">
+                    <div class="response-author"><%= resp.role === 'marketing' ? 'Marketing' : 'Você' %></div>
                     <p><%= resp.message %></p>
                     <small><%= new Date(resp.created_at).toLocaleString('pt-BR') %></small>
                   </div>
                 <% }); %>
               </div>
+
+              <details class="reply-details">
+                <summary>Responder</summary>
+                <form action="/track/reply/<%= project.id %>" method="POST" class="response-form">
+                  <input type="hidden" name="name" value="<%= name %>" />
+                  <textarea name="message" rows="3" placeholder="Escreva sua resposta..." required></textarea>
+                  <button type="submit">Enviar</button>
+                </form>
+              </details>
             <% } else { %>
               <div class="no-response">
                 <p>&#128064; Nenhuma resposta do marketing ainda. Assim que responderem, aparecerá aqui.</p>
